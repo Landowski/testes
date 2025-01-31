@@ -1,0 +1,27 @@
+name: Publicar Página Estática
+
+on:
+  repository_dispatch:
+    types: [create-page]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v3
+
+      - name: Criar/Atualizar arquivo HTML
+        run: |
+          echo "${{ github.event.client_payload.html_content }}" | base64 --decode > pages/${{ github.event.client_payload.slug }}.html
+
+      - name: Commit e Push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions@github.com"
+          git add pages/${{ github.event.client_payload.slug }}.html
+          git commit -m "Adicionando página: ${{ github.event.client_payload.slug }}.html" || echo "Nenhuma mudança para commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
