@@ -1,8 +1,14 @@
-name: Publicar Página Estática
+name: Deploy Static Page
 
 on:
-  repository_dispatch:
-    types: [create-page]
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: 'Slug do arquivo'
+        required: true
+      html_content:
+        description: 'Conteúdo HTML em Base64'
+        required: true
 
 jobs:
   deploy:
@@ -10,18 +16,20 @@ jobs:
 
     steps:
       - name: Checkout do repositório
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Criar/Atualizar arquivo HTML
+      - name: Criar diretório de páginas (caso não exista)
         run: |
-          echo "${{ github.event.client_payload.html_content }}" | base64 --decode > pages/${{ github.event.client_payload.slug }}.html
+          mkdir -p pages
 
-      - name: Commit e Push
+      - name: Criar arquivo HTML
+        run: |
+          echo "${{ inputs.html_content }}" | base64 --decode > pages/${{ inputs.slug }}.html
+
+      - name: Commit e Push da nova página
         run: |
           git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions@github.com"
-          git add pages/${{ github.event.client_payload.slug }}.html
-          git commit -m "Adicionando página: ${{ github.event.client_payload.slug }}.html" || echo "Nenhuma mudança para commit"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pages/${{ inputs.slug }}.html
+          git commit -m "Adicionando página ${{ inputs.slug }}"
           git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
