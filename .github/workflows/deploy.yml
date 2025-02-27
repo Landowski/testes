@@ -13,6 +13,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
     steps:
       - name: Checkout do repositório
@@ -26,10 +28,13 @@ jobs:
         run: |
           echo "${{ inputs.html_content }}" | base64 --decode > pages/${{ inputs.slug }}.html
 
-      - name: Commit e Push da nova página
+      - name: Configurar usuário do Git
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit e Push da nova página
+        run: |
           git add pages/${{ inputs.slug }}.html
           git commit -m "Adicionando página ${{ inputs.slug }}"
-          git push
+          git push https://x-access-token:${{ env.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
