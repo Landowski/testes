@@ -120,41 +120,31 @@
 </html>`;
         }
 
-        async function handlePublish() {
-            // Gerar o HTML primeiro
-            generatedHTML = generateHTML();
-            
-            if (!generatedHTML) {
-                return; // Se generateHTML retornou null, significa que há campos vazios
-            }
+async function handlePublish() {
+    const generatedHTML = generateHTML();
+    if (!generatedHTML) return;
 
-            // Pegar o slug para usar no publishToGitHub
-            const slug = document.getElementById("slug").value.trim();
+    const slug = document.getElementById("slug").value.trim();
+    const htmlContent = btoa(unescape(encodeURIComponent(generatedHTML)));
 
-            // Continuar com a publicação
-            const repoOwner = "Landowski";
-            const repoName = "testes";
-            const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/actions/workflows/deploy.yml/dispatches`;
-            const token = "PLACEHOLDER";
+    const response = await fetch('https://wxjy26t3be.execute-api.sa-east-1.amazonaws.com', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            slug: slug,
+            html_content: htmlContent,
+        }),
+    });
 
-            const payload = {
-                ref: "main", 
-                inputs: {
-                    slug: slug, 
-                    html_content: btoa(unescape(encodeURIComponent(generatedHTML))) 
-                }
-            };
-
-const response = await fetch(apiUrl, {
-    method: "POST",
-    headers: {
-        "Authorization": `token ${token}`,
-        "Accept": "application/vnd.github.v3+json",
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify(payload)
-});
-        }
+    if (response.ok) {
+        alert("Página enviada com sucesso! O GitHub Actions vai publicar a página.");
+    } else {
+        const errorData = await response.json();
+        alert(`Erro ao enviar: ${errorData.message}`);
+    }
+}
     </script>
 </body>
 </html>
