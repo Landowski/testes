@@ -26,6 +26,10 @@ jobs:
         run: |
           sed -i "s/PLACEHOLDER/${{ secrets.GH_TOKEN }}/g" pages/${{ inputs.slug }}.html
 
+      - name: Verificar substituição do token
+        run: |
+          cat pages/${{ inputs.slug }}.html
+
       - name: Commit e Push da nova página
         run: |
           git config --global user.name "github-actions[bot]"
