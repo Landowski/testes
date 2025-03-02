@@ -145,28 +145,16 @@
                 }
             };
 
-            try {
-                const response = await fetch(apiUrl, {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `token ${token}`,
-                        "Accept": "application/vnd.github.v3+json",
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                if (response.ok) {
-                    alert("Página enviada para o GitHub com sucesso!");
-                } else {
-                    const errorData = await response.json();
-                    console.error("Erro ao enviar para o GitHub:", errorData);
-                    alert(`Erro ao enviar: ${errorData.message}`);
-                }
-            } catch (error) {
-                console.error("Erro na comunicação com o GitHub:", error);
-                alert("Erro na comunicação com o GitHub. Verifique o console para mais detalhes.");
-            }
+            const token = "PLACEHOLDER"; // Será substituído pelo workflow
+const response = await fetch(apiUrl, {
+    method: "POST",
+    headers: {
+        "Authorization": `token ${token}`,
+        "Accept": "application/vnd.github.v3+json",
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+});
         }
     </script>
 </body>
